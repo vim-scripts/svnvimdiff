@@ -49,6 +49,9 @@ if [ -z $files ] || ! [ -f $files ] ; then
     files=$(svn st 2> /dev/null | grep -e "^[MU]" | cut -c 3-)
     for f in $files; do
       if ! [ -f $f ]; then break; fi
+      filename=`basename $f`
+	  ending=${filename/*./}
+	  orig=$orig"."$ending 
       cp "$f" $orig
       svn diff $args $f > $patch
       if ! [ $? -eq 0 ]; then break; fi
@@ -57,6 +60,9 @@ if [ -z $files ] || ! [ -f $files ] ; then
     done
 else
     # file given, so just work with that one
+    filename=`basename $files`
+    ending=${filename/*./}
+    orig=$orig"."$ending
     cp $files $orig
     svn diff $args > $patch
     if ! [ $? -eq 0 ]; then break; fi
