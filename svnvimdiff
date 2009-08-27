@@ -43,7 +43,7 @@ shift $shift_args
 files="$1"
 patch=`tempfile -p $suffix`
 orig=`tempfile -p $suffix`
-trap "rm -f $patch $orig" EXIT
+tempfiles="$patch $orig"
 if [ -z $files ] || ! [ -f $files ] ; then
     # No file given, so loop over all files svn st says have changed
     files=$(svn st 2> /dev/null | grep -e "^[MU]" | cut -c 3-)
@@ -57,6 +57,8 @@ if [ -z $files ] || ! [ -f $files ] ; then
       if ! [ $? -eq 0 ]; then break; fi
       patch -R -p0 $orig $patch
       $vimdiff $orig $f
+      tempfiles+=" $orig"
+      trap "rm -f $tempfiles" EXIT
     done
 else
     # file given, so just work with that one
@@ -68,4 +70,6 @@ else
     if ! [ $? -eq 0 ]; then break; fi
     patch -R -p0 $orig $patch
     $vimdiff $orig $files
+    tempfiles+=" $orig"
+    trap "rm -f $tempfiles" EXIT
 fi
