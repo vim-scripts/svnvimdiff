@@ -41,8 +41,8 @@ fi
 args=$*
 shift $shift_args
 files="$1"
-patch=`tempfile -p $suffix`
-orig=`tempfile -p $suffix`
+patch=`tempfile --suffix $suffix`
+orig=`tempfile --suffix $suffix`
 tempfiles="$patch $orig"
 if [ -z $files ] || ! [ -f $files ] ; then
     # No file given, so loop over all files svn st says have changed
@@ -50,8 +50,7 @@ if [ -z $files ] || ! [ -f $files ] ; then
     for f in $files; do
       if ! [ -f $f ]; then break; fi
       filename=`basename $f`
-	  ending=${filename/*./}
-	  orig=$orig"."$ending 
+	  orig=$orig"."$filename
       cp "$f" $orig
       svn diff $args $f > $patch
       if ! [ $? -eq 0 ]; then break; fi
@@ -63,8 +62,7 @@ if [ -z $files ] || ! [ -f $files ] ; then
 else
     # file given, so just work with that one
     filename=`basename $files`
-    ending=${filename/*./}
-    orig=$orig"."$ending
+    orig=$orig"."$efilenamending
     cp $files $orig
     svn diff $args > $patch
     if ! [ $? -eq 0 ]; then break; fi
